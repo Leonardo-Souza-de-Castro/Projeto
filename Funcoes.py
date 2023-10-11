@@ -1,27 +1,46 @@
+todos = []
+
 def creat(): # Está função é responsável pelo cadastro de novos clientes
-    cliente = []
+    cliente = {}
 
     # Aqui estão todos os dados necessários para criação de uma nova conta
-    nome = input("Digite a razão social da sua empresa: ") 
-    cnpj = input("Digite o seu CNPJ: ")
-    tipo = input("Digite o tipo de conta da sua empresa: ")
+    nome = input("Digite a razão social da sua empresa: ")
+    while(True): # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite o seu CNPJ: \n"))
+
+        if len(str(cnpj)) < 14:
+            print("Digite um valor válido para CNPJ")
+    
+        if len(str(cnpj)) == 14:
+            break
+
+    tipo = input("Digite o tipo de conta da sua empresa: \n 1 - Comum \n 2 - Plus \n")
     valor = float(input("Digite o valor inicial que quer ter em conta: "))
     senha = input("Digite uma senha para sua conta: ")
 
     # Aqui os dados solicitados estão entrando em uma lista de clientes para serem levados ao arquivo de dado
-    cliente.append(nome)
-    cliente.append(cnpj)
-    cliente.append(tipo)
-    cliente.append(valor)
-    cliente.append(senha)
+    cliente["nome"] = nome
+    cliente["cnpj"] = cnpj
+    cliente["tipo"] = tipo
+    cliente["valor"] = valor
+    cliente["senha"] = senha
 
     # Exibição dos dados informados
-    print(*cliente)
+    # print(*cliente)
+
+    todos.append(cliente)
+    print("Sucesso!")
+    return "sucesso"
 
 def delet(): # Função necessária para deletar contas
     cnpj = input("Digite o seu CNPJ: ") 
 
-    print(cnpj)
+    for a in range(len(todos)): # Percorre toda a lista de clientes
+        for _ in todos[a]: 
+            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado e o remove
+                todos.pop(a)
+                print("Cliente deletado com sucesso!")
+                
 
 def listar(): # Função necessária para listar todos os clientes 
     print("Aqui serão listados todos os clientes cadastrados!")
