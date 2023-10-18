@@ -115,8 +115,8 @@ def transf(): # Função necessária para fazer transferencia entre contas
             if todos[a][_] == cnpj_destino: # Localiza a conta de destino
                 cliente_destino = todos[a]
 
-    valor_origem = todos[a]['valor'] - valor # Remove o valor transferido da conta de origem 
-    valor_destino = todos[a]['valor'] + valor # Adiciona o valor transferido a conta de destino
+    valor_origem = cliente_origem['valor'] - valor # Remove o valor transferido da conta de origem 
+    valor_destino = cliente_destino['valor'] + valor # Adiciona o valor transferido a conta de destino
 
     cliente_origem['valor'] = valor_origem
     cliente_destino['valor'] = valor_destino
