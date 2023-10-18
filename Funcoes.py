@@ -8,24 +8,21 @@ def creat(): # Está função é responsável pelo cadastro de novos clientes
 
     if nome == "" or nome == " ":
         nome = input("Por favor digite um nome válido: ")
-
-    cnpj = int(input("Digite o seu CNPJ: \n"))
-    # while(True): # Valida se CNPJ digitado tem 14 digitos como o oficial
-    #     cnpj = int(input("Digite o seu CNPJ: \n"))
-
-    #     if len(str(cnpj)) < 14:
-    #         print("Digite um valor válido para CNPJ")
     
-    #     if len(str(cnpj)) == 14:
-    #         break
+    while(True): # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite o seu CNPJ: \n"))
 
-    tipo = input("Digite o tipo de conta da sua empresa: \n 1 - Comum \n 2 - Plus \n")
+        if len(str(cnpj)) < 14:
+            print("Digite um valor válido para CNPJ")
     
-    if tipo != "1" or tipo != '2':
-        tipo = input("Por favor digite um tipo de conta válido: \n 1 - Comum \n 2 - Plus \n")
+        if len(str(cnpj)) == 14:
+            break
 
+    tipo = str(input("Digite o tipo de conta da sua empresa: \n 1 - Comum \n 2 - Plus \n"))
 
     valor = float(input("Digite o valor inicial que quer ter em conta: "))
+    if valor <= 0:
+        valor = float(input("Digite um valor valido: "))
 
     senha = input("Digite uma senha para sua conta: ")
     if senha == "" or senha == " ":
