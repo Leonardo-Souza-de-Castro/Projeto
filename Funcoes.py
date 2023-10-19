@@ -6,26 +6,24 @@ def creat(): # Está função é responsável pelo cadastro de novos clientes
     # Aqui estão todos os dados necessários para criação de uma nova conta
     nome = input("Digite a razão social da sua empresa: ")
 
-    if nome == "" or nome == " ":
+    if nome == "" or nome == " ": # Valida se o nome digitado foi preenchido
         nome = input("Por favor digite um nome válido: ")
     
-    while(True): # Valida se CNPJ digitado tem 14 digitos como o oficial
-        cnpj = int(input("Digite o seu CNPJ: \n"))
+    cnpj = int(input("Digite o seu CNPJ: \n"))
 
-        if len(str(cnpj)) < 14:
-            print("Digite um valor válido para CNPJ")
-    
-        if len(str(cnpj)) == 14:
-            break
+    if len(str(cnpj)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite um valor válido para CNPJ: \n"))
 
-    tipo = str(input("Digite o tipo de conta da sua empresa: \n 1 - Comum \n 2 - Plus \n"))
+    tipo = input("Digite o tipo de conta da sua empresa: \n 1 - Comum \n 2 - Plus \n")
+    if tipo != '1' and tipo != '2': # Valida se o tipo escolhido existe
+        tipo = input("Digite um valor válido para tipo: \n 1 - Comum \n 2 - Plus \n")
 
     valor = float(input("Digite o valor inicial que quer ter em conta: "))
-    if valor <= 0:
+    if valor < 0: # Valida se o valor inicial da conta não é negativo
         valor = float(input("Digite um valor valido: "))
 
     senha = input("Digite uma senha para sua conta: ")
-    if senha == "" or senha == " ":
+    if senha == "" or senha == " ": # Valida se a senha digitada foi preenchido
         senha = input("Por favor digite uma senha válido: ")
 
     # Aqui os dados solicitados estão entrando em uma lista de clientes para serem levados ao arquivo de dado
@@ -35,47 +33,58 @@ def creat(): # Está função é responsável pelo cadastro de novos clientes
     cliente["valor"] = valor
     cliente["senha"] = senha
 
-    # Exibição dos dados informados
-    # print(*cliente)
-
-    todos.append(cliente)
-    print("\n Sucesso! \n")
-    return "sucesso"
+    todos.append(cliente) # Adiciona os clientes a lista de todos os clientes
+    print("\n Cadastrado com sucesso! \n") # Mensagem de retorno
 
 def delet(): # Função necessária para deletar contas
-    cnpj = input("Digite o seu CNPJ: ") 
+    cnpj = int(input("Digite o seu CNPJ: "))
+    if len(str(cnpj)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite um valor válido para CNPJ: \n")) 
 
     for a in range(len(todos)): # Percorre toda a lista de clientes
         for _ in todos[a]: 
-            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado e o remove
+            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado
                 todos.pop(a)
                 print("Cliente deletado com sucesso!")
                 
 
 def listar(): # Função necessária para listar todos os clientes 
-    print("Aqui serão listados todos os clientes cadastrados!")
+    print("Clientes cadastrados: ")
 
-    for a in range(len(todos)):
-        print(todos[a])
+    for a in range(len(todos)): # Aqui percorre a lista de todos os clientes
+        print(todos[a]) # Exibe todos os clientes um por um
 
 def debito(): # Função necessária para debitar um valor em uma conta
-    cnpj = input("Digite o seu CNPJ: ") # CNPJ que irá receber o valor
+    cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ do titular da conta
+    if len(str(cnpj)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite um valor válido para CNPJ: \n")) 
+
     senha = input("Digite a senha da sua conta: ") # Senha desta conta
+    if senha == "" or senha == " ": # Valida se a senha digitada foi preenchido
+        senha = input("Por favor digite uma senha válido: ")
+
     valor = float(input("Digite o valor a ser debitado: ")) # Valor a ser debitado
+    if valor < 0: # Valida se o valor a ser debitado não é negativo
+        valor = float(input("Digite um valor valido: "))
 
     for a in range(len(todos)): # Percorre toda a lista de clientes
         for _ in todos[a]: 
-            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado e o remove
+            if todos[a][_] == cnpj: # Verfica se exite o cnpj digitado
                 if todos[a]['senha'] == senha: # Valida a senha do usuario
                     valor_inicial = todos[a]['valor']
                     todos[a]['valor'] = valor_inicial - valor # Debita o valor do saldo da conta
 
-                    print(todos[a])
+                    print("\n Dinheiro debitado com sucesso ! \n")
 
 
 def deposito(): # Função necessária para depositar um valor em uma determinada conta
-    cnpj = input("Digite o seu CNPJ: ") # CNPJ que irá receber o valor
+    cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ que irá receber o valor
+    if len(str(cnpj)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj = int(input("Digite um valor válido para CNPJ: \n"))
+
     valor = float(input("Digite o valor a ser depositado: ")) # Valor a ser debitado
+    if valor < 0: # Valida se o valor inicial da conta não é negativo
+        valor = float(input("Digite um valor valido: "))
 
     for a in range(len(todos)): # Percorre toda a lista de clientes
         for _ in todos[a]: 
@@ -83,23 +92,34 @@ def deposito(): # Função necessária para depositar um valor em uma determinad
                 valor_inicial = todos[a]['valor']
                 todos[a]['valor'] = valor_inicial + valor # Adiciona o deposito ao saldo da conta
 
-                print(todos[a])
+                print("\n Dinheiro depositado com sucesso ! \n")
 
 def extrato(): # Função necessária para exibir o extrato de uma conta 
-    cnpj = input("Digite o seu CNPJ: ") # CNPJ do titular da conta
+    cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ do titular da conta
     senha = input("Digite a senha da sua conta: ") # Senha do titular da conta
 
     print(cnpj)
     print(senha)
 
 def transf(): # Função necessária para fazer transferencia entre contas
-    cnpj_origem = input("Digite o seu CNPJ: ") # CNPJ da origem da transferencia
-    senha = input("Digite a senha da sua conta: ") # senha da origem da transferencia
-    cnpj_destino = input("Digite o CNPJ do representante da outra conta: ") # CNPJ de destino da transferencia
-    valor = float(input("Digite o valor a ser transferido: ")) # valor a ser transferido
+    cnpj_origem = int(input("Digite o seu CNPJ: ")) # CNPJ da origem da transferencia
+    if len(str(cnpj_origem)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj_origem = int(input("Digite um valor válido para CNPJ: \n"))
 
-    cliente_origem = {} #Conta de origem da transação
-    cliente_destino = {} #Conta de destino da transação
+    senha = input("Digite a senha da sua conta: ") # senha da origem da transferencia
+    if senha == "" or senha == " ": # Valida se a senha digitada foi preenchido
+        senha = input("Por favor digite uma senha válido: ")
+
+    cnpj_destino = int(input("Digite o CNPJ do representante da outra conta: ")) # CNPJ de destino da transferencia
+    if len(str(cnpj_destino)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
+        cnpj_destino = int(input("Digite um valor válido para CNPJ: \n"))
+
+    valor = float(input("Digite o valor a ser transferido: ")) # valor a ser transferido
+    if valor < 0: # Valida se o valor não é negativo
+        valor = float(input("Digite um valor valido: "))
+
+    cliente_origem = {} # Conta de origem da transação
+    cliente_destino = {} # Conta de destino da transação
 
     for a in range(len(todos)): # Percorre toda a lista de clientes
         for _ in todos[a]: 
@@ -118,24 +138,18 @@ def transf(): # Função necessária para fazer transferencia entre contas
     cliente_origem['valor'] = valor_origem
     cliente_destino['valor'] = valor_destino
 
-
-def pagar_funcionarios(): # Função necessária para pagar os funcionarios
-    quant = int(input("Quantos funcionário deseja pagar: "))
-    func = []
-    info_func = []
-
-    for i in range(0,quant):
-        cnpj_destino = input("Digite o CNPJ do representante da outra conta: ") # CNPJ de destino da transferencia
-        valor = float(input("Digite o valor a ser transferido: ")) # valor a ser transferido
-        func.append(cnpj_destino)
-        func.append(valor)
-
-        info_func.append(func)
+    print("\n Valor transferido com sucesso! \n")
 
 
-    cnpj_origem = input("Digite o seu CNPJ: ") # CNPJ da origem da transferencia
-    senha_origem = input("Digite a senha da sua conta: ") # senha da origem da transferencia
+def editar_senha(): # Função necessária para pagar os funcionarios
+    cnpj = int(input("Digite o CNPJ da sua conta: "))
+    senha = input("Digite sua senha atual: ")
+    nova_senha = input("Digite a nova senha: ")
 
-    print(cnpj_origem)
-    print(senha_origem)
-    print(*info_func)
+    for a in range(len(todos)): # Percorre toda a lista de clientes
+        for _ in todos[a]: 
+            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado e o remove
+                if todos[a]['senha'] == senha: # Valida a senha do usuario
+                    todos[a]['senha'] = nova_senha # Debita o valor do saldo da conta
+
+                    print("Senha alterada com sucesso!")
