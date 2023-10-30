@@ -1,7 +1,7 @@
 from datetime import datetime
 import ast
 
-dados = {}
+# dados = {}
 
 todos = []
 
@@ -54,7 +54,7 @@ def delet(): # Função necessária para deletar contas
         cnpj = int(input("Digite um valor válido para CNPJ: \n")) 
 
     for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
-        dados = ast.literal_eval(a) # transforma a string "a" e dicionario
+        dados = ast.literal_eval(a) # transforma a string "a" em dicionario
          
         if dados['cnpj'] != cnpj: # Verifica quais são os clientes com cnpj diferente do informado
             clientes_atualizado.append(a) # Adiciona a lista de clientes que não serão deletados
@@ -86,14 +86,27 @@ def debito(): # Função necessária para debitar um valor em uma conta
     if valor < 0: # Valida se o valor a ser debitado não é negativo
         valor = float(input("Digite um valor valido: "))
 
-    for a in range(len(todos)): # Percorre toda a lista de clientes
-        for _ in todos[a]: 
-            if todos[a][_] == cnpj: # Verfica se exite o CNPJ digitado
-                if todos[a]['senha'] == senha: # Valida a senha do usuario
-                    valor_inicial = todos[a]['valor']
-                    todos[a]['valor'] = valor_inicial - valor # Debita o valor do saldo da conta
+    clientes_dados = open("clientes.txt", "r") # Arquivo com os dados dos clientes
 
-                    print("\n Dinheiro debitado com sucesso ! \n")
+    clientes_atualizado = [] # lista com os dados atualizados
+
+    for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
+        dados = ast.literal_eval(a) # transforma a string "a" em dicionario
+         
+        if dados['cnpj'] == cnpj: # Localiza as infos do cliente
+            if dados['senha'] == senha: # Valida senha
+                dados['valor'] -= valor # Debita o valor
+                clientes_atualizado.append(str(f"{dados} \n"))
+        else:
+            clientes_atualizado.append(a)
+
+    clientes_dados.close() # Fecha o arquivo de leitura
+
+    dados_novos = open("clientes.txt", "w") # Abre o arquivo de escrita
+    dados_novos.writelines(clientes_atualizado)
+    dados_novos.close() # Fecha o arquivo de escrita
+
+    print("\n Dinheiro debitado com sucesso ! \n")
 
 
 def deposito(): # Função necessária para depositar um valor em uma determinada conta
@@ -105,13 +118,25 @@ def deposito(): # Função necessária para depositar um valor em uma determinad
     if valor < 0: # Valida se o valor inicial da conta não é negativo
         valor = float(input("Digite um valor valido: "))
 
-    for a in range(len(todos)): # Percorre toda a lista de clientes
-        for _ in todos[a]: 
-            if todos[a][_] == cnpj: # Verfiica se exite o cnpj digitado
-                valor_inicial = todos[a]['valor']
-                todos[a]['valor'] = valor_inicial + valor # Adiciona o deposito ao saldo da conta
+    clientes_dados = open("clientes.txt", "r") # Arquivo com os dados dos clientes
 
-                print("\n Dinheiro depositado com sucesso ! \n")
+    clientes_atualizado = [] # lista com os dados atualizados
+
+    for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
+        dados = ast.literal_eval(a) # transforma a string "a" em dicionario
+         
+        if dados['cnpj'] == cnpj: # Localiza as infos do cliente
+            dados['valor'] += valor # Debita o valor
+            clientes_atualizado.append(str(f"{dados} \n"))
+        else:
+            clientes_atualizado.append(a)
+
+    clientes_dados.close() # Fecha o arquivo de leitura
+
+    dados_novos = open("clientes.txt", "w") # Abre o arquivo de escrita
+    dados_novos.writelines(clientes_atualizado)
+    dados_novos.close() # Fecha o arquivo de escrita
+    print("\n Dinheiro depositado com sucesso ! \n")
 
 def extrato(): # Função necessária para exibir o extrato de uma conta 
     cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ do titular da conta

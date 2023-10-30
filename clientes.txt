@@ -1,1 +1,2 @@
-{'nome': 'teste', 'cnpj': 12345678912347, 'tipo': '1', 'valor': 100.0, 'senha': '123'} 
+{'nome': 'teste2', 'cnpj': 12345678912346, 'tipo': '1', 'valor': 90.0, 'senha': '123'} 
+{'nome': 'teste', 'cnpj': 12345678912345, 'tipo': '1', 'valor': 100.0, 'senha': '123'} 
