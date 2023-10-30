@@ -1,6 +1,12 @@
+from datetime import datetime
+import ast
+
+dados = {}
+
 todos = []
 
 def creat(): # Função necessária para cadastro de novos clientes
+    clientes_dados = open("clientes.txt", "a") # Arquivo com os dados dos clientes
     cliente = {}
 
     # Aqui estão todos os dados necessários para criação de uma nova conta
@@ -34,25 +40,38 @@ def creat(): # Função necessária para cadastro de novos clientes
     cliente["senha"] = senha
 
     todos.append(cliente) # Adiciona os clientes a lista de todos os clientes
+    clientes_dados.write(f"{cliente} \n") # Escreve o novo cliente no arquivo
+    clientes_dados.close() # Fecha o arquivo e salva os dados
     print("\n Cadastrado com sucesso! \n") # Mensagem de retorno
 
 def delet(): # Função necessária para deletar contas
+    clientes_dados = open("clientes.txt", "r") # Arquivo com os dados dos clientes
+
+    clientes_atualizado = [] # lista com os clientes que não serão deletados
+
     cnpj = int(input("Digite o seu CNPJ: "))
     if len(str(cnpj)) < 14: # Valida se CNPJ digitado tem 14 digitos como o oficial
         cnpj = int(input("Digite um valor válido para CNPJ: \n")) 
 
-    for a in range(len(todos)): # Percorre toda a lista de clientes
-        for _ in todos[a]: 
-            if todos[a][_] == cnpj: # Verfiica se exite o CNPJ digitado
-                todos.pop(a)
-                print("Cliente deletado com sucesso!")
-                
+    for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
+        dados = ast.literal_eval(a) # transforma a string "a" e dicionario
+         
+        if dados['cnpj'] != cnpj: # Verifica quais são os clientes com cnpj diferente do informado
+            clientes_atualizado.append(a) # Adiciona a lista de clientes que não serão deletados
+
+    clientes_dados.close() # Fecha o arquivo de leitura
+
+    dados_novos = open("clientes.txt", "w") # Abre o arquivo de escrita
+    dados_novos.writelines(clientes_atualizado) # Escreve os clientes atualizados
+    dados_novos.close() # Fecha o arquivo de escrita
+    print("Cliente deletado com sucesso!")        
 
 def listar(): # Função necessária para listar todos os clientes 
     print("Clientes cadastrados: ")
+    dados = open("clientes.txt", "r")
 
-    for a in range(len(todos)): # Aqui percorre a lista de todos os clientes
-        print(todos[a]) # Exibe todos os clientes um por um
+    for a in dados.readlines():  # Aqui percorre a lista de todos os clientes
+        print(a)  # Exibe todos os clientes um por um
 
 def debito(): # Função necessária para debitar um valor em uma conta
     cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ do titular da conta
