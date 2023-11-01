@@ -68,8 +68,6 @@ def delet(): # Função necessária para deletar contas
     clientes_dados.close() # Fecha o arquivo de leitura
 
     atualiza_arquivo(clientes_atualizado) # Atualiza o arquivo
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Conta {cnpj} deletada"
-    atualiza_extrato(cnpj, mensagem_extrato)
     print("Cliente deletado com sucesso!")        
 
 def listar(): # Função necessária para listar todos os clientes 
@@ -77,7 +75,12 @@ def listar(): # Função necessária para listar todos os clientes
     clientes_dados = open("clientes.txt", "r") # Abre o arquivo com os dados dos clientes
 
     for a in clientes_dados.readlines():  # Aqui percorre a lista de todos os clientes
-        print(a)  # Exibe todos os clientes um por um
+        dados = ast.literal_eval(a)
+        print(f"""
+        Nome: {dados['nome']}
+        CNPJ: {dados['cnpj']}
+        Saldo: R${dados['valor']}
+        """)  # Exibe todos os clientes um por um
 
 def debito(): # Função necessária para debitar um valor em uma conta
     cnpj = int(input("Digite o seu CNPJ: ")) # CNPJ do titular da conta
@@ -96,13 +99,33 @@ def debito(): # Função necessária para debitar um valor em uma conta
 
     clientes_atualizado = [] # lista com os dados atualizados
 
+    mensagem_extrato = ""
+
     for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
         dados = ast.literal_eval(a) # transforma a string "a" em dicionario
          
         if dados['cnpj'] == cnpj: # Localiza as infos do cliente
             if dados['senha'] == senha: # Valida senha
-                dados['valor'] -= valor # Debita o valor
-                clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                if dados['tipo'] == '1':
+                    valor_final = dados['valor'] - valor - (valor * 0.5) # Debita o valor
+                    if valor_final >= -3000:
+                        dados['valor'] = valor_final
+                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.5)} Saldo: R${dados['valor']}"
+                        atualiza_extrato(cnpj, mensagem_extrato)
+                    else:
+                        print("\n Saldo não disponivel! \n")
+                        clientes_atualizado.append(str(f"{dados} \n"))
+                else:
+                    valor_final = dados['valor'] - valor - (valor * 0.3)
+                    if valor_final >= -5000:
+                        dados['valor'] = valor_final
+                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.3)} Saldo: R${dados['valor']}"
+                        atualiza_extrato(cnpj, mensagem_extrato)
+                    else:
+                        print("\n Saldo não disponivel! \n")
+                        clientes_atualizado.append(str(f"{dados} \n"))
             else:
                 clientes_atualizado.append(a)
                 print("Senha inválida")
@@ -110,10 +133,8 @@ def debito(): # Função necessária para debitar um valor em uma conta
             clientes_atualizado.append(a) # Adiciona a lista de clientes atualizados
 
     clientes_dados.close() # Fecha o arquivo de leitura
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Debito de R${valor} na conta do cliente {cnpj}"
 
     atualiza_arquivo(clientes_atualizado) # Atualiza o arquivo
-    atualiza_extrato(cnpj, mensagem_extrato)
 
     print("\n Dinheiro debitado com sucesso ! \n")
 
@@ -137,6 +158,8 @@ def deposito(): # Função necessária para depositar um valor em uma determinad
         if dados['cnpj'] == cnpj: # Localiza as infos do cliente
             dados['valor'] += valor # Debita o valor
             clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+            mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} +R${valor} Tarifa: R$ 0.00 Saldo: R${dados['valor']}"
+            atualiza_extrato(cnpj, mensagem_extrato)
         else:
             clientes_atualizado.append(a)# Adiciona a lista de clientes atualizados
 
@@ -144,8 +167,6 @@ def deposito(): # Função necessária para depositar um valor em uma determinad
 
     atualiza_arquivo(clientes_atualizado) # Atualiza o arquivo
 
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Deposito de R${valor} na conta do cliente {cnpj}"
-    atualiza_extrato(cnpj, mensagem_extrato)
     print("\n Dinheiro depositado com sucesso ! \n")
 
 def extrato(): # Função necessária para exibir o extrato de uma conta 
@@ -158,6 +179,11 @@ def extrato(): # Função necessária para exibir o extrato de uma conta
         dados = ast.literal_eval(a) # transforma a string "a" em dicionario
          
         if dados['cnpj'] == cnpj: # Localiza as infos do cliente
+            print(f"""
+Razão Social: {dados['nome']}
+CNPJ: {dados['cnpj']}
+Tipo: {dados['tipo'] == '1' and "Comum" or "Plus"}
+            """)
             if dados['senha'] == senha:
                 extrato = open(f"{cnpj}.txt", "r")
                 for value in extrato.readlines():
@@ -196,25 +222,40 @@ def transf(): # Função necessária para fazer transferencia entre contas
          
         if dados['cnpj'] == cnpj_origem: # Localiza as infos do cliente
             if dados['senha'] == senha: # Valida a senha
-                dados['valor'] -= valor # Retira o valor
-                clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                if dados['tipo'] == '1':
+                    valor_final = dados['valor'] - valor - (valor * 0.5) # Debita o valor
+                    if valor_final >= -3000:
+                        dados['valor'] = valor_final
+                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.5)} Saldo: R${dados['valor']}"
+                        atualiza_extrato(cnpj_origem, mensagem_extrato)
+                    else:
+                        print("\n Saldo não disponivel! \n")
+                        clientes_atualizado.append(str(f"{dados} \n"))
+                else:
+                    valor_final = dados['valor'] - valor - (valor * 0.3)
+                    if valor_final >= -5000:
+                        dados['valor'] = valor_final
+                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.3)} Saldo: R${dados['valor']}"
+                        atualiza_extrato(cnpj_origem, mensagem_extrato)
+                    else:
+                        print("\n Saldo não disponivel! \n")
+                        clientes_atualizado.append(str(f"{dados} \n"))
             else:
                 print("\n Senha Inválida \n")
                 clientes_atualizado.append(a)
         elif dados['cnpj'] == cnpj_destino: # Localiza as infos do cliente
             dados['valor'] += valor # Adiciona o valor
             clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+            mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} +R${valor} Tarifa: R$ 0.00 Saldo: R${dados['valor']}"
+            atualiza_extrato(cnpj_destino, mensagem_extrato)
         else:
             clientes_atualizado.append(a) # Adiciona a lista de clientes atualizados
 
     clientes_dados.close() # Fecha o arquivo de leitura
 
     atualiza_arquivo(clientes_atualizado) # Atualiza o arquivo
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Transferencia de R${valor} da conta do cliente {cnpj_origem}"
-    atualiza_extrato(cnpj_origem, mensagem_extrato)
-
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Transferencia de R${valor} para conta do cliente {cnpj_destino}"
-    atualiza_extrato(cnpj_destino, mensagem_extrato)
 
     print("\n Valor transferido com sucesso! \n")
 
@@ -242,7 +283,7 @@ def editar_senha(): # Função necessária para alterar senha da conta
 
     atualiza_arquivo(clientes_atualizado) # Atualiza o arquivo
 
-    mensagem_extrato = f"{datetime.now().strftime("%d/%m/%Y %H:%M")} - Alteração da senha na conta do cliente {cnpj}"
+    mensagem_extrato = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} - Alteração da senha na conta do cliente CNPJ: {cnpj}" # Mensagem que será salva no extrato
     atualiza_extrato(cnpj, mensagem_extrato)
 
     print("\n Senha alterada com sucesso! \n")
