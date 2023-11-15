@@ -104,33 +104,32 @@ def debito(): # Função necessária para debitar um valor em uma conta
     for a in clientes_dados.readlines(): # Percorre toda a lista de clientes
         dados = ast.literal_eval(a) # transforma a string "a" em dicionario
          
-        if dados['cnpj'] == cnpj: # Localiza as infos do cliente
-            if dados['senha'] == senha: # Valida senha
-                if dados['tipo'] == '1':
-                    valor_final = dados['valor'] - valor - (valor * 0.5) # Debita o valor
-                    if valor_final >= -3000:
-                        dados['valor'] = valor_final
-                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
-                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.5)} Saldo: R${dados['valor']}"
-                        atualiza_extrato(cnpj, mensagem_extrato)
-                    else:
-                        print("\n Saldo não disponivel! \n")
-                        clientes_atualizado.append(str(f"{dados} \n"))
+        if dados['cnpj'] == cnpj and dados['senha'] == senha: # Localiza as infos do cliente
+            if dados['tipo'] == '1':
+                valor_final = dados['valor'] - valor - (valor * 0.5) # Debita o valor
+                if valor_final >= -3000:
+                    dados['valor'] = valor_final
+                    clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                    mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.5)} Saldo: R${dados['valor']}"
+                    atualiza_extrato(cnpj, mensagem_extrato)
                 else:
-                    valor_final = dados['valor'] - valor - (valor * 0.3)
-                    if valor_final >= -5000:
-                        dados['valor'] = valor_final
-                        clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
-                        mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.3)} Saldo: R${dados['valor']}"
-                        atualiza_extrato(cnpj, mensagem_extrato)
-                    else:
-                        print("\n Saldo não disponivel! \n")
-                        clientes_atualizado.append(str(f"{dados} \n"))
+                    print("\n Saldo não disponivel! \n")
+                    clientes_atualizado.append(str(f"{dados} \n"))
             else:
-                clientes_atualizado.append(a)
-                print("Senha inválida")
+                valor_final = dados['valor'] - valor - (valor * 0.3)
+                if valor_final >= -5000:
+                    dados['valor'] = valor_final
+                    clientes_atualizado.append(str(f"{dados} \n")) # Adiciona a lista de clientes atualizados
+                    mensagem_extrato = f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')} -R${valor} Tarifa: R$ {(valor * 0.3)} Saldo: R${dados['valor']}"
+                    atualiza_extrato(cnpj, mensagem_extrato)
+                else:
+                    print("\n Saldo não disponivel! \n")
+                    clientes_atualizado.append(str(f"{dados} \n"))
         else:
-            clientes_atualizado.append(a) # Adiciona a lista de clientes atualizados
+            clientes_atualizado.append(a)
+            print("Senha ou CNPJ inválida")
+    else:
+        clientes_atualizado.append(a) # Adiciona a lista de clientes atualizados
 
     clientes_dados.close() # Fecha o arquivo de leitura
 
